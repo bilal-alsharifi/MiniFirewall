@@ -1,0 +1,1 @@
+This is a pre-compiled kernel for Android 5.1.1 (API 22) on Android Emulator (goldfish) running an ARM processor. Kernel version is 3.4. This kernel supports LKM so you can replace the current kernel with it in order to run a loadable kernel modules.

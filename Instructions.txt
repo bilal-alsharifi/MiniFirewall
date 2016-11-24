@@ -1,0 +1,342 @@
+------------------------------------------------------------------------Prepare the Environment------------------------------------------------------------------------
+
+------------------------------------Install Ubuntu------------------------------------
+Install Ubuntu64
+
+------------------------------------Install Java------------------------------------
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+sudo apt install oracle-java8-set-default
+
+------------------------------------Install Android Studio------------------------------------
+-Download from https://developer.android.com/studio/index.html
+-Extract to ~/
+-~/android-studio/bin/studio.sh
+
+------------------------------------Modifiy PATH------------------------------------
+gedit ~/.bashrc
+
+then add the following lines to the end of the file and restart the terminal:
+
+export PATH=$PATH:~/Android/Sdk/tools
+export PATH=$PATH:~/Android/Sdk/platform-tools
+
+------------------------------------Add AVD------------------------------------
+-android sdk   (download API 22 for ARM)
+-android avd 
+-emulator -verbose -avd test
+
+------------------------------------Install NDK------------------------------------
+-Download from https://developer.android.com/ndk/downloads/index.html
+-Extract to ~/
+
+
+------------------------------------------------------------------------Compile Kernel------------------------------------------------------------------------
+---------------------------Install GIT---------------------------
+sudo apt-get install git 
+git config --global user.name "seed"
+git config --global user.email "seed@example.com"
+
+------------------------------Download and Build Goldfish kernel------------------------------
+Note: you should make sure that you are downloading the exact same kernel version that is used in Android Emulator. The kernel version that is used in API 22 is 3.4
+
+cd ~/Desktop
+git clone https://android.googlesource.com/kernel/goldfish.git
+cd goldfish
+git branch -a
+git checkout -t origin/android-goldfish-3.4 -b goldfish
+export ARCH=arm
+export CROSS_COMPILE=~/android-ndk-r13b/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
+make goldfish_armv7_defconfig
+open .conf file and change CONFIG_MODULES=y
+make
+
+------------------------------Answer Compiling Questions------------------------------
+scripts/kconfig/conf --silentoldconfig Kconfig
+.config:161:warning: override: reassigning to symbol MODULES
+*
+* Restart config...
+*
+*
+* General setup
+*
+Prompt for development and/or incomplete code/drivers (EXPERIMENTAL) [Y/n/?] y
+Cross-compiler tool prefix (CROSS_COMPILE) [] 
+Local version - append to kernel release (LOCALVERSION) [] 
+Automatically append version information to the version string (LOCALVERSION_AUTO) [Y/n/?] y
+Kernel compression mode
+> 1. Gzip (KERNEL_GZIP)
+  2. LZMA (KERNEL_LZMA)
+  3. XZ (KERNEL_XZ)
+  4. LZO (KERNEL_LZO)
+choice[1-4?]: 1
+Default hostname (DEFAULT_HOSTNAME) [(none)] (none)
+Support for paging of anonymous memory (swap) (SWAP) [Y/n/?] y
+System V IPC (SYSVIPC) [Y/n/?] y
+POSIX Message Queues (POSIX_MQUEUE) [N/y/?] n
+BSD Process Accounting (BSD_PROCESS_ACCT) [N/y/?] n
+open by fhandle syscalls (FHANDLE) [N/y/?] n
+Export task/process statistics through netlink (EXPERIMENTAL) (TASKSTATS) [N/y/?] n
+Auditing support (AUDIT) [Y/n/?] y
+  Enable system-call auditing support (AUDITSYSCALL) [Y/n/?] y
+  Make audit loginuid immutable (AUDIT_LOGINUID_IMMUTABLE) [N/y/?] n
+Kernel .config support (IKCONFIG) [Y/n/m/?] y
+  Enable access to .config through /proc/config.gz (IKCONFIG_PROC) [Y/n/?] y
+Kernel log buffer size (16 => 64KB, 17 => 128KB) (LOG_BUF_SHIFT) [16] 16
+Checkpoint/restore support (CHECKPOINT_RESTORE) [N/y/?] n
+Automatic process group scheduling (SCHED_AUTOGROUP) [N/y/?] n
+Enable deprecated sysfs features to support old userspace tools (SYSFS_DEPRECATED) [N/y/?] n
+Kernel->user space relay support (formerly relayfs) (RELAY) [Y/?] y
+Initial RAM filesystem and RAM disk (initramfs/initrd) support (BLK_DEV_INITRD) [Y/n/?] y
+  Initramfs source file(s) (INITRAMFS_SOURCE) [] 
+  Support initial ramdisks compressed using gzip (RD_GZIP) [Y/n/?] y
+  Support initial ramdisks compressed using bzip2 (RD_BZIP2) [N/y/?] n
+  Support initial ramdisks compressed using LZMA (RD_LZMA) [N/y/?] n
+  Support initial ramdisks compressed using XZ (RD_XZ) [N/y/?] n
+  Support initial ramdisks compressed using LZO (RD_LZO) [N/y/?] n
+Optimize for size (CC_OPTIMIZE_FOR_SIZE) [Y/n/?] y
+Default panic timeout (PANIC_TIMEOUT) [0] 0
+Enable full-sized data structures for core (BASE_FULL) [Y/n/?] y
+Enable futex support (FUTEX) [Y/n/?] y
+Enable eventpoll support (EPOLL) [Y/n/?] y
+Enable signalfd() system call (SIGNALFD) [Y/n/?] y
+Enable timerfd() system call (TIMERFD) [Y/n/?] y
+Enable eventfd() system call (EVENTFD) [Y/n/?] y
+Use full shmem filesystem (SHMEM) [Y/n/?] y
+Enable AIO support (AIO) [Y/n/?] y
+Embedded system (EMBEDDED) [Y/n/?] y
+Enable VM event counters for /proc/vmstat (VM_EVENT_COUNTERS) [Y/n/?] y
+Disable heap randomization (COMPAT_BRK) [Y/n/?] y
+Choose SLAB allocator
+> 1. SLAB (SLAB)
+  2. SLUB (Unqueued Allocator) (SLUB)
+  3. SLOB (Simple Allocator) (SLOB)
+choice[1-3?]: 1
+Profiling support (PROFILING) [N/y/?] n
+Kprobes (KPROBES) [N/y/?] (NEW) N
+Optimize very unlikely/likely branches (JUMP_LABEL) [N/y/?] n
+Number of bits to use for ASLR of mmap base address (ARCH_MMAP_RND_BITS) [16] 16
+*
+* Enable loadable module support
+*
+Enable loadable module support (MODULES) [Y/n/?] y
+  Forced module loading (MODULE_FORCE_LOAD) [N/y/?] (NEW) y
+  Module unloading (MODULE_UNLOAD) [N/y/?] (NEW) y
+    Forced module unloading (MODULE_FORCE_UNLOAD) [N/y/?] (NEW) y
+  Module versioning support (MODVERSIONS) [N/y/?] (NEW) y
+  Source checksum for all modules (MODULE_SRCVERSION_ALL) [N/y/?] (NEW) y
+*
+* Networking options
+*
+Packet socket (PACKET) [Y/n/m/?] y
+Unix domain sockets (UNIX) [Y/n/m/?] y
+  UNIX: socket monitoring interface (UNIX_DIAG) [N/m/y/?] n
+Transformation user configuration interface (XFRM_USER) [N/m/y/?] n
+Transformation sub policy support (EXPERIMENTAL) (XFRM_SUB_POLICY) [N/y/?] n
+Transformation migrate database (EXPERIMENTAL) (XFRM_MIGRATE) [N/y/?] n
+Transformation statistics (EXPERIMENTAL) (XFRM_STATISTICS) [N/y/?] n
+PF_KEY sockets (NET_KEY) [Y/n/m/?] y
+  PF_KEY MIGRATE (EXPERIMENTAL) (NET_KEY_MIGRATE) [N/y/?] n
+TCP/IP networking (INET) [Y/n/?] y
+  IP: multicasting (IP_MULTICAST) [Y/n/?] y
+  IP: advanced router (IP_ADVANCED_ROUTER) [Y/n/?] y
+    FIB TRIE statistics (IP_FIB_TRIE_STATS) [N/y/?] n
+    IP: policy routing (IP_MULTIPLE_TABLES) [Y/n/?] y
+    IP: equal cost multipath (IP_ROUTE_MULTIPATH) [N/y/?] n
+    IP: verbose route monitoring (IP_ROUTE_VERBOSE) [N/y/?] n
+  IP: kernel level autoconfiguration (IP_PNP) [Y/n/?] y
+    IP: DHCP support (IP_PNP_DHCP) [Y/n/?] y
+    IP: BOOTP support (IP_PNP_BOOTP) [Y/n/?] y
+    IP: RARP support (IP_PNP_RARP) [N/y/?] n
+  IP: tunneling (NET_IPIP) [N/m/y/?] n
+  IP: GRE demultiplexer (NET_IPGRE_DEMUX) [N/m/y/?] n
+  IP: multicast routing (IP_MROUTE) [Y/n/?] y
+    IP: multicast policy routing (IP_MROUTE_MULTIPLE_TABLES) [N/y/?] n
+    IP: PIM-SM version 1 support (IP_PIMSM_V1) [Y/n/?] y
+    IP: PIM-SM version 2 support (IP_PIMSM_V2) [Y/n/?] y
+  IP: ARP daemon support (ARPD) [N/y/?] n
+  IP: TCP syncookie support (SYN_COOKIES) [Y/n/?] y
+  IP: AH transformation (INET_AH) [N/m/y/?] n
+  IP: ESP transformation (INET_ESP) [Y/n/m/?] y
+  IP: IPComp transformation (INET_IPCOMP) [N/m/y/?] n
+  IP: IPsec transport mode (INET_XFRM_MODE_TRANSPORT) [Y/n/m/?] y
+  IP: IPsec tunnel mode (INET_XFRM_MODE_TUNNEL) [Y/n/m/?] y
+  IP: IPsec BEET mode (INET_XFRM_MODE_BEET) [N/m/y/?] n
+  Large Receive Offload (ipv4/tcp) (INET_LRO) [N/m/y/?] n
+  INET: socket monitoring interface (INET_DIAG) [N/m/y/?] n
+  TCP: MD5 Signature Option support (RFC2385) (EXPERIMENTAL) (TCP_MD5SIG) [N/y/?] n
+  NetLabel subsystem support (NETLABEL) [N/y/?] n
+Only allow certain groups to create sockets (ANDROID_PARANOID_NETWORK) [Y/n/?] y
+Network activity statistics tracking (NET_ACTIVITY_STATS) [Y/n/?] y
+Security Marking (NETWORK_SECMARK) [Y/?] y
+Timestamping in PHY devices (NETWORK_PHY_TIMESTAMPING) [N/y/?] n
+The RDS Protocol (EXPERIMENTAL) (RDS) [N/m/y/?] n
+Asynchronous Transfer Mode (ATM) (ATM) [N/m/y/?] n
+802.1d Ethernet Bridging (BRIDGE) [Y/n/m/?] y
+  IGMP/MLD snooping (BRIDGE_IGMP_SNOOPING) [Y/n/?] y
+Distributed Switch Architecture support (NET_DSA) [N/m/y/?] n
+802.1Q VLAN Support (VLAN_8021Q) [Y/n/m/?] y
+  GVRP (GARP VLAN Registration Protocol) support (VLAN_8021Q_GVRP) [N/y/?] n
+DECnet Support (DECNET) [N/m/y/?] n
+ANSI/IEEE 802.2 LLC type 2 Support (LLC2) [N/m/y/?] n
+The IPX protocol (IPX) [N/m/y/?] n
+Appletalk protocol support (ATALK) [N/m/y/?] n
+CCITT X.25 Packet Layer (EXPERIMENTAL) (X25) [N/m/y/?] n
+LAPB Data Link Driver (EXPERIMENTAL) (LAPB) [N/m/y/?] n
+Acorn Econet/AUN protocols (EXPERIMENTAL) (ECONET) [N/m/y/?] n
+WAN router (WAN_ROUTER) [N/m/y/?] n
+Phonet protocols family (PHONET) [N/m/y/?] n
+IEEE Std 802.15.4 Low-Rate Wireless Personal Area Networks support (EXPERIMENTAL) (IEEE802154) [N/m/y/?] n
+Data Center Bridging support (DCB) [N/y/?] n
+B.A.T.M.A.N. Advanced Meshing Protocol (BATMAN_ADV) [N/m/y/?] n
+Open vSwitch (OPENVSWITCH) [N/m/y/?] n
+Network priority cgroup (NETPRIO_CGROUP) [N/m/y/?] n
+enable BPF Just In Time compiler (BPF_JIT) [N/y/?] (NEW) y
+*
+* Memory Technology Device (MTD) support
+*
+Memory Technology Device (MTD) support (MTD) [Y/n/m/?] y
+  MTD tests support (DANGEROUS) (MTD_TESTS) [N/m/?] (NEW) n
+  RedBoot partition table parsing (MTD_REDBOOT_PARTS) [N/m/y/?] n
+  Command line partition table parsing (MTD_CMDLINE_PARTS) [N/y/?] n
+  ARM Firmware Suite partition parsing (MTD_AFS_PARTS) [N/m/y/?] n
+  TI AR7 partitioning support (MTD_AR7_PARTS) [N/m/y/?] n
+  *
+  * User Modules And Translation Layers
+  *
+  Direct char device access to MTD devices (MTD_CHAR) [Y/n/m/?] y
+  Common interface to block layer for MTD 'translation layers' (MTD_BLKDEVS) [Y] y
+  Caching block device access to MTD devices (MTD_BLOCK) [Y/n/m/?] y
+  FTL (Flash Translation Layer) support (FTL) [N/m/y/?] n
+  NFTL (NAND Flash Translation Layer) support (NFTL) [N/m/y/?] n
+  INFTL (Inverse NAND Flash Translation Layer) support (INFTL) [N/m/y/?] n
+  Resident Flash Disk (Flash Translation Layer) support (RFD_FTL) [N/m/y/?] n
+  NAND SSFDC (SmartMedia) read only translation layer (SSFDC) [N/m/y/?] n
+  SmartMedia/xD new translation layer (SM_FTL) [N/m/y/?] n
+  Log panic/oops to an MTD buffer (MTD_OOPS) [N/m/y/?] n
+  Swap on MTD device support (MTD_SWAP) [N/m/y/?] n
+  Include chip ids for known NAND devices. (MTD_NAND_IDS) [N/m/y/?] n
+*
+* Staging drivers
+*
+Staging drivers (STAGING) [Y/n/?] y
+  Line Echo Canceller support (ECHO) [N/m/y/?] n
+  Support for rtllib wireless devices (RTLLIB) [N/m/?] (NEW) n
+  Silicon Motion SM7XX Frame Buffer Support (FB_SM7XX) [N/m/y/?] n
+  Drivers for Flarion ft1000 devices (FT1000) [N/m/y] n
+*
+* Cryptographic API
+*
+Cryptographic API (CRYPTO) [Y/?] y
+  *
+  * Crypto core or helper
+  *
+  Cryptographic algorithm manager (CRYPTO_MANAGER) [Y/?] y
+  Userspace cryptographic algorithm configuration (CRYPTO_USER) [N/m/y/?] n
+  Disable run-time self tests (CRYPTO_MANAGER_DISABLE_TESTS) [Y/n/?] y
+  GF(2^128) multiplication functions (CRYPTO_GF128MUL) [N/m/y/?] n
+  Null algorithms (CRYPTO_NULL) [N/m/y/?] n
+  Software async crypto daemon (CRYPTO_CRYPTD) [N/m/y/?] n
+  Authenc support (CRYPTO_AUTHENC) [Y/?] y
+  Testing module (CRYPTO_TEST) [N/m/?] (NEW) n
+  *
+  * Authenticated Encryption with Associated Data
+  *
+  CCM support (CRYPTO_CCM) [N/m/y/?] n
+  GCM/GMAC support (CRYPTO_GCM) [N/m/y/?] n
+  Sequence Number IV Generator (CRYPTO_SEQIV) [N/m/y/?] n
+  *
+  * Block modes
+  *
+  CBC support (CRYPTO_CBC) [Y/?] y
+  CTR support (CRYPTO_CTR) [N/m/y/?] n
+  CTS support (CRYPTO_CTS) [N/m/y/?] n
+  ECB support (CRYPTO_ECB) [Y/n/m/?] y
+  LRW support (CRYPTO_LRW) [N/m/y/?] n
+  PCBC support (CRYPTO_PCBC) [Y/n/m/?] y
+  XTS support (CRYPTO_XTS) [N/m/y/?] n
+  *
+  * Hash modes
+  *
+  HMAC support (CRYPTO_HMAC) [Y/?] y
+  XCBC support (CRYPTO_XCBC) [N/m/y/?] n
+  VMAC support (CRYPTO_VMAC) [N/m/y/?] n
+  *
+  * Digest
+  *
+  CRC32c CRC algorithm (CRYPTO_CRC32C) [Y/?] y
+  GHASH digest algorithm (CRYPTO_GHASH) [N/m/y/?] n
+  MD4 digest algorithm (CRYPTO_MD4) [N/m/y/?] n
+  MD5 digest algorithm (CRYPTO_MD5) [Y/?] y
+  Michael MIC keyed digest algorithm (CRYPTO_MICHAEL_MIC) [N/m/y/?] n
+  RIPEMD-128 digest algorithm (CRYPTO_RMD128) [N/m/y/?] n
+  RIPEMD-160 digest algorithm (CRYPTO_RMD160) [N/m/y/?] n
+  RIPEMD-256 digest algorithm (CRYPTO_RMD256) [N/m/y/?] n
+  RIPEMD-320 digest algorithm (CRYPTO_RMD320) [N/m/y/?] n
+  SHA1 digest algorithm (CRYPTO_SHA1) [Y/?] y
+  SHA1 digest algorithm (ARM-asm) (CRYPTO_SHA1_ARM) [N/m/y/?] n
+  SHA224 and SHA256 digest algorithm (CRYPTO_SHA256) [Y/n/m/?] y
+  SHA384 and SHA512 digest algorithms (CRYPTO_SHA512) [N/m/y/?] n
+  Tiger digest algorithms (CRYPTO_TGR192) [N/m/y/?] n
+  Whirlpool digest algorithms (CRYPTO_WP512) [N/m/y/?] n
+  *
+  * Ciphers
+  *
+  AES cipher algorithms (CRYPTO_AES) [Y/n/m/?] y
+  AES cipher algorithms (ARM-asm) (CRYPTO_AES_ARM) [N/m/y/?] n
+  Anubis cipher algorithm (CRYPTO_ANUBIS) [N/m/y/?] n
+  ARC4 cipher algorithm (CRYPTO_ARC4) [N/m/y/?] n
+  Blowfish cipher algorithm (CRYPTO_BLOWFISH) [N/m/y/?] n
+  Camellia cipher algorithms (CRYPTO_CAMELLIA) [N/m/y/?] n
+  CAST5 (CAST-128) cipher algorithm (CRYPTO_CAST5) [N/m/y/?] n
+  CAST6 (CAST-256) cipher algorithm (CRYPTO_CAST6) [N/m/y/?] n
+  DES and Triple DES EDE cipher algorithms (CRYPTO_DES) [Y/?] y
+  FCrypt cipher algorithm (CRYPTO_FCRYPT) [N/m/y/?] n
+  Khazad cipher algorithm (CRYPTO_KHAZAD) [N/m/y/?] n
+  Salsa20 stream cipher algorithm (EXPERIMENTAL) (CRYPTO_SALSA20) [N/m/y/?] n
+  SEED cipher algorithm (CRYPTO_SEED) [N/m/y/?] n
+  Serpent cipher algorithm (CRYPTO_SERPENT) [N/m/y/?] n
+  TEA, XTEA and XETA cipher algorithms (CRYPTO_TEA) [N/m/y/?] n
+  Twofish cipher algorithm (CRYPTO_TWOFISH) [Y/n/m/?] y
+  *
+  * Compression
+  *
+  Deflate compression algorithm (CRYPTO_DEFLATE) [N/m/y/?] n
+  Zlib compression algorithm (CRYPTO_ZLIB) [N/m/y/?] n
+  LZO compression algorithm (CRYPTO_LZO) [N/m/y/?] n
+  *
+  * Random Number Generation
+  *
+  Pseudo Random Number Generation for Cryptographic modules (CRYPTO_ANSI_CPRNG) [N/m/y/?] n
+  User-space interface for hash algorithms (CRYPTO_USER_API_HASH) [N/m/y/?] n
+  User-space interface for symmetric key cipher algorithms (CRYPTO_USER_API_SKCIPHER) [N/m/y/?] n
+#
+# configuration written to .config
+#
+
+
+------------------------------------------------------------------------Replace kernel & test LKMs------------------------------------------------------------------------
+------------------------------Replace kernel & test------------------------------
+cp -r ~/Android/Sdk/system-images/android-22/default/armeabi-v7a/kernel-qemu ~/Android/Sdk/system-images/android-22/default/armeabi-v7a/kernel-qemu-original
+cp -r arch/arm/boot/zImage ~/Android/Sdk/system-images/android-22/default/armeabi-v7a/kernel-qemu
+emulator -verbose -avd test
+
+---------------------------Make sdcard writable (only if sdcard is not writable)---------------------------
+adb shell
+mount -o rw,remount rootfs /; chmod 777 /mnt/sdcard;
+exit
+
+---------------------------Compile module---------------------------
+-make sure that Makefile has the correct paths for kernel source code and NDK
+-make
+
+---------------------------Copy module device---------------------------
+adb push minifirewall.ko /sdcard/
+adb shell
+cd /sdcard/
+insmod minifirewall.ko
+dmesg
+
+
+
