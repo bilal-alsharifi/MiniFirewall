@@ -338,5 +338,10 @@ cd /sdcard/
 insmod minifirewall.ko
 dmesg
 
+---------------------------View & add rules---------------------------
+cat /proc/inc_rules
+cat /proc/out_rules
+echo -n "10.0.0.70:*" > /proc/out_rules
+
 
 
